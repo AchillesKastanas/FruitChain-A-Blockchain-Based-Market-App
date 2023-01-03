@@ -107,19 +107,7 @@ public class DatabaseManager {
 
     //Gets the latest hash code of the product of the same title
     public String getLatestBlockHash() {
-        String query = "SELECT hash FROM blocks ORDER BY rowid DESC LIMIT 1";
-        try (Connection conn = this.doConnect(); PreparedStatement stmt = conn.prepareStatement(query)) {
-            ResultSet rs = stmt.executeQuery();
-
-            // loop through the result set
-            while (rs.next()) {
-                return rs.getString("hash");
-            }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-        //Returns empty if no other blocks where found in the db
-        return "";
+        return blockChain.get(blockChain.size() - 1).getHash();
     }
 
     public void searchProduct(String title) {
