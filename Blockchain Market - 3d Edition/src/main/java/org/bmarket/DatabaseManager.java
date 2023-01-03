@@ -123,6 +123,9 @@ public class DatabaseManager {
 
     //Gets the latest hash code
     public String getLatestBlockHash() {
+        if(blockChain.isEmpty()){
+            return "";
+        }
         return blockChain.get(blockChain.size() -1).getHash();
     }
 

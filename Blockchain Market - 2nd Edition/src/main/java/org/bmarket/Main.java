@@ -4,10 +4,14 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Main {
 
     public static void main(String[] args) {
+        //Creating a thread pool of 4 Threads
+        ExecutorService executor = Executors.newFixedThreadPool(4);
 
         //INIT
         DatabaseManager databaseManager = DatabaseManager.getInstance();
@@ -46,9 +50,9 @@ public class Main {
 
                     Product product2 = new Product("#" + String.valueOf( new Random().nextInt(99999) ),title2, String.valueOf( new Timestamp(System.currentTimeMillis())), price2, description2, category2, String.valueOf(databaseManager.getLatestProductCode(title2)));
                     Block block2 = new Block(databaseManager.getLatestBlockHash(), product2.toArray(), new Timestamp(System.currentTimeMillis()));
-                    Thread thread2 = new Thread(block2);
-                    System.out.println("MINING '" + title2 + "' STARTED BY THREAD: [" + thread2.getName() + "] AT: " + new Timestamp(System.currentTimeMillis()));
-                    thread2.start();
+
+                    Runnable worker2 = block2;
+                    executor.execute(worker2);
                     break;
                 case 3:
                     Scanner scanner3 = new Scanner(System.in);
@@ -89,9 +93,8 @@ public class Main {
                     }
 
                     for (Block block: queue) {
-                        Thread thread = new Thread(block);
-                        System.out.println("MINING STARTED BY THREAD: [" + thread.getName() + "] AT: " + new Timestamp(System.currentTimeMillis()));
-                        thread.start();
+                        Runnable worker = block;
+                        executor.execute(worker);
                     }
 
                     break;
