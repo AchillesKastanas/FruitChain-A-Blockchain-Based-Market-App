@@ -1,5 +1,6 @@
 package org.bmarket;
 
+import javax.xml.crypto.Data;
 import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -11,10 +12,19 @@ public class DatabaseManager {
     // establish connection with the database
     private static String DATABASE_URL = "jdbc:sqlite:" + System.getProperty("user.dir") + "/database";
     private ArrayList<Block> blockChain = new ArrayList<>();
+    private static final Object lock = new Object();
+    private static DatabaseManager singleInstance = null;
 
     //Load all the stored blocks in the blockchain arraylist
-    public DatabaseManager(){
+    private DatabaseManager(){
         updateBlockChain();
+    }
+
+    public static DatabaseManager getInstance(){
+        if(singleInstance == null){
+            singleInstance = new DatabaseManager();
+        }
+        return singleInstance;
     }
 
     private Connection doConnect() {
@@ -43,14 +53,15 @@ public class DatabaseManager {
     // insert user details in the User table
     public void insertBlock(Block block) {
         //Synchronized is used to ensure that only one thread can access this at once
-        synchronized (DatabaseManager.class){
+        synchronized (lock){
             System.out.println("IM INSERTING A BLOCK");
             String[] data = block.toArray();
             String sql = "INSERT OR IGNORE INTO blocks(hash, previousHash, blockTimestamp, nonce, productCode,title,timeOfCreation,price,description,category,prevRecord) VALUES(?,?,?,?,?,?,?,?,?,?,?)";
 
             try (Connection conn = this.doConnect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
                 pstmt.setString(1, data[0]);
-                pstmt.setString(2, data[1]);
+                pstmt.setString(2, getLatestBlockHash());//data[1] could have a not-mined hash due to the unexpected nature of threads. Getting the last block
+                                                    // from the blockchain arrayList guaranties us the correct latest mined hash
                 pstmt.setString(3, data[2]);
                 pstmt.setString(4, data[3]);
                 pstmt.setString(5, data[4]);
@@ -67,6 +78,7 @@ public class DatabaseManager {
             }
             //Update the blockchain
             updateBlockChain();
+            System.out.println("DONE");
         }
     }
 
@@ -109,21 +121,9 @@ public class DatabaseManager {
         return "-";
     }
 
-    //Gets the latest hash code of the product of the same title
+    //Gets the latest hash code
     public String getLatestBlockHash() {
-        String query = "SELECT hash FROM blocks ORDER BY rowid DESC LIMIT 1";
-        try (Connection conn = this.doConnect(); PreparedStatement stmt = conn.prepareStatement(query)) {
-            ResultSet rs = stmt.executeQuery();
-
-            // loop through the result set
-            while (rs.next()) {
-                return rs.getString("hash");
-            }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-        //Returns empty if no other blocks where found in the db
-        return "";
+        return blockChain.get(blockChain.size() -1).getHash();
     }
 
     public void searchProduct(String title) {

@@ -11,7 +11,7 @@ public class Block implements Runnable{
     private Timestamp timeStamp;
     private int nonce;
     private String[] data;
-    private int PREFIX = 6;
+    private int PREFIX = 2;
     private DatabaseManager databaseManager;
 
     @Override
@@ -21,12 +21,12 @@ public class Block implements Runnable{
     }
 
     //Used to create a new Block
-    public Block(String previousHash, String[] data, Timestamp timeStamp, DatabaseManager databaseManager) {
+    public Block(String previousHash, String[] data, Timestamp timeStamp) {
         this.previousHash = previousHash;
         this.data = data;
         this.timeStamp = timeStamp;
         this.hash = calculateBlockHash();
-        this.databaseManager = databaseManager;
+        this.databaseManager = DatabaseManager.getInstance();
     }
 
     //Used to Initialise an already created block (pulled from the database)

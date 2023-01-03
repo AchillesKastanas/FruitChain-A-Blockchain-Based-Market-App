@@ -10,7 +10,7 @@ public class Main {
     public static void main(String[] args) {
 
         //INIT
-        DatabaseManager databaseManager = new DatabaseManager();
+        DatabaseManager databaseManager = DatabaseManager.getInstance();
         databaseManager.createTable();
         boolean exit = true;
 
@@ -45,7 +45,7 @@ public class Main {
                     category2 = scanner2.nextLine();
 
                     Product product2 = new Product("#" + String.valueOf( new Random().nextInt(99999) ),title2, String.valueOf( new Timestamp(System.currentTimeMillis())), price2, description2, category2, String.valueOf(databaseManager.getLatestProductCode(title2)));
-                    Block block2 = new Block(databaseManager.getLatestBlockHash(), product2.toArray(), new Timestamp(System.currentTimeMillis()), databaseManager);
+                    Block block2 = new Block(databaseManager.getLatestBlockHash(), product2.toArray(), new Timestamp(System.currentTimeMillis()));
                     Thread thread2 = new Thread(block2);
                     System.out.println("MINING '" + title2 + "' STARTED BY THREAD: [" + thread2.getName() + "] AT: " + new Timestamp(System.currentTimeMillis()));
                     thread2.start();
@@ -67,6 +67,10 @@ public class Main {
                         }
                     }
 
+                    //Created a temp array to store the threads, in order to run them together.
+                    //This was made to demonstrate the functionality of the threads
+                    ArrayList<Block> queue = new ArrayList<>();
+
                     for(int i = 0; i < counter; i++){
                         System.out.println("Title: ");
                         title3 = scanner3.nextLine();
@@ -78,10 +82,16 @@ public class Main {
                         category3 = scanner3.nextLine();
 
                         Product product3 = new Product("#" + String.valueOf( new Random().nextInt(99999) ),title3, String.valueOf( new Timestamp(System.currentTimeMillis())), price3, description3, category3, String.valueOf(databaseManager.getLatestProductCode(title3)));
-                        Block block3 = new Block(databaseManager.getLatestBlockHash(), product3.toArray(), new Timestamp(System.currentTimeMillis()), databaseManager);
-                        Thread thread3 = new Thread(block3);
-                        System.out.println("MINING '" + title3 + "' STARTED BY THREAD: [" + thread3.getName() + "] AT: " + new Timestamp(System.currentTimeMillis()));
-                        thread3.start();
+                        Block block3;
+                        //previousHash is -1 since it is not mined yet
+                        block3 = new Block("-1", product3.toArray(), new Timestamp(System.currentTimeMillis()));
+                        queue.add(block3);
+                    }
+
+                    for (Block block: queue) {
+                        Thread thread = new Thread(block);
+                        System.out.println("MINING STARTED BY THREAD: [" + thread.getName() + "] AT: " + new Timestamp(System.currentTimeMillis()));
+                        thread.start();
                     }
 
                     break;
