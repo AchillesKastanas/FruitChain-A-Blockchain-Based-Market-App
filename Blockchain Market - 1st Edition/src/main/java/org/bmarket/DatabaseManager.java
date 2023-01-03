@@ -47,7 +47,7 @@ public class DatabaseManager {
 
         try (Connection conn = this.doConnect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, data[0]);
-            pstmt.setString(2, data[1]);
+            pstmt.setString(2, getLatestBlockHash());
             pstmt.setString(3, data[2]);
             pstmt.setString(4, data[3]);
             pstmt.setString(5, data[4]);
@@ -107,6 +107,9 @@ public class DatabaseManager {
 
     //Gets the latest hash code of the product of the same title
     public String getLatestBlockHash() {
+        if(blockChain.isEmpty()){
+            return "";
+        }
         return blockChain.get(blockChain.size() - 1).getHash();
     }
 

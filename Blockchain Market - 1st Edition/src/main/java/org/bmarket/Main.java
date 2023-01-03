@@ -6,7 +6,6 @@ import java.util.Random;
 import java.util.Scanner;
 
 public class Main {
-    static int PREFIX = 3;
 
     public static void main(String[] args) {
 
@@ -48,7 +47,7 @@ public class Main {
                     Product product2 = new Product("#" + String.valueOf( new Random().nextInt(99999) ),title2, String.valueOf( new Timestamp(System.currentTimeMillis())), price2, description2, category2, String.valueOf(databaseManager.getLatestProductCode(title2)));
                     Block block2 = new Block(databaseManager.getLatestBlockHash(), product2.toArray(), new Timestamp(System.currentTimeMillis()));
                     System.out.println("MINING '" + title2 + "' STARTED AT: " + new Timestamp(System.currentTimeMillis()));
-                    block2.mineBlock(PREFIX);
+                    block2.mineBlock();
                     databaseManager.insertBlock(block2);
                     break;
                 case 3:
@@ -68,6 +67,8 @@ public class Main {
                         }
                     }
 
+                    ArrayList<Block> queue = new ArrayList<>();
+
                     for(int i = 0; i < counter; i++){
                         System.out.println("Title: ");
                         title3 = scanner3.nextLine();
@@ -80,9 +81,13 @@ public class Main {
 
                         Product product3 = new Product("#" + String.valueOf( new Random().nextInt(99999) ),title3, String.valueOf( new Timestamp(System.currentTimeMillis())), price3, description3, category3, String.valueOf(databaseManager.getLatestProductCode(title3)));
                         Block block3 = new Block(databaseManager.getLatestBlockHash(), product3.toArray(), new Timestamp(System.currentTimeMillis()));
-                        System.out.println("MINING '" + title3 + "' STARTED AT: " + new Timestamp(System.currentTimeMillis()));
-                        block3.mineBlock(PREFIX);
-                        databaseManager.insertBlock(block3);
+                        queue.add(block3);
+                    }
+
+                    for (Block block: queue) {
+                        System.out.println("MINING STARTED AT: " + new Timestamp(System.currentTimeMillis()));
+                        block.mineBlock();
+                        databaseManager.insertBlock(block);
                     }
 
                     break;

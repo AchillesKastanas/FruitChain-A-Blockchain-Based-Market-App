@@ -11,6 +11,7 @@ public class Block {
     private Timestamp timeStamp;
     private int nonce;
     private String[] data;
+    static int PREFIX = 5;
 
     //Used to create a new Block
     public Block(String previousHash, String[] data, Timestamp timeStamp) {
@@ -47,10 +48,10 @@ public class Block {
         return builder.toString();
     }
 
-    public String mineBlock(int prefix){
+    public String mineBlock(){
         String prefixString =
-                new String(new char[prefix]).replace('\0','0');
-        while (!hash.substring(0,prefix).equals(prefixString)){
+                new String(new char[PREFIX]).replace('\0','0');
+        while (!hash.substring(0,PREFIX).equals(prefixString)){
             nonce++;
             hash = calculateBlockHash();
         }

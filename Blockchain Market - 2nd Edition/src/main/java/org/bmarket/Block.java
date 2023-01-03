@@ -16,6 +16,7 @@ public class Block implements Runnable{
 
     @Override
     public void run() {
+        System.out.println("MINING STARTED BY THREAD: [ " + Thread.currentThread().getName() + "] AT: " + new Timestamp(System.currentTimeMillis()));
         mineBlock();
         databaseManager.insertBlock(this);
     }
