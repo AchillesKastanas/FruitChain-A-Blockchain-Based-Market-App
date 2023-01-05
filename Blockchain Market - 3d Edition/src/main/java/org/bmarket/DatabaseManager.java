@@ -126,7 +126,7 @@ public class DatabaseManager {
         if(blockChain.isEmpty()){
             return "";
         }
-        return blockChain.get(blockChain.size() -1).getHash();
+        return blockChain.get(blockChain.size() - 1).getHash();
     }
 
     public void searchProduct(String title) {

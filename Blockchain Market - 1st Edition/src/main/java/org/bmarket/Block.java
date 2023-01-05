@@ -11,7 +11,7 @@ public class Block {
     private Timestamp timeStamp;
     private int nonce;
     private String[] data;
-    static int PREFIX = 5;
+    static int PREFIX = 6;
 
     //Used to create a new Block
     public Block(String previousHash, String[] data, Timestamp timeStamp) {

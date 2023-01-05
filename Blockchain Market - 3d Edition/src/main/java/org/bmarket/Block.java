@@ -11,7 +11,7 @@ public class Block implements Runnable{
     private Timestamp timeStamp;
     private int nonce;
     private String[] data;
-    private int PREFIX = 2;
+    private int PREFIX = 6;
     private DatabaseManager databaseManager;
 
     @Override
